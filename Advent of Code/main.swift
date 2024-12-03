@@ -4,7 +4,6 @@
 //
 
 import Foundation
-import RegexHelper
 
 func main() {
     let fileUrl = URL(fileURLWithPath: "./aoc-input")
@@ -19,14 +18,13 @@ func main() {
         reports.append(parseLine(line))
     }
 
-    let safeReports = reports.filter {
-        print($0)
-        let safe = isSafe($0)
-        print(safe)
-        return safe
-    }.count
+    let safeReports = reports.filter { isSafe($0) }.count
     
     print(safeReports)
+    
+    let safeReportsWithExceptions = reports.filter { isSafeWithExceptions($0) }.count
+    
+    print(safeReportsWithExceptions)
 }
 
 func isSafe(_ report: [Int]) -> Bool {
@@ -43,6 +41,15 @@ func isSafe(_ report: [Int]) -> Bool {
     }
     
     return true
+}
+
+func isSafeWithExceptions(_ report: [Int]) -> Bool {
+    for i in 0..<report.count {
+        var modifiedReport = report
+        modifiedReport.remove(at: i)
+        if isSafe(modifiedReport) { return true }
+    }
+    return false
 }
 
 func parseLine(_ line: String) -> [Int] {
