@@ -14,26 +14,39 @@ func main() {
         .filter { !$0.isEmpty }
     
     // Sample algorithm
-    var scoreboard = [String: Int]()
+    var reports = [[Int]]()
     lines.forEach { line in
-        let (name, score) = parseLine(line)
-        scoreboard[name] = score
+        reports.append(parseLine(line))
     }
-    scoreboard
-        .sorted { lhs, rhs in
-            lhs.value > rhs.value
-        }
-        .forEach { name, score in
-            print("\(name) \(score) pts")
-        }
+
+    let safeReports = reports.filter {
+        print($0)
+        let safe = isSafe($0)
+        print(safe)
+        return safe
+    }.count
+    
+    print(safeReports)
 }
 
-func parseLine(_ line: String) -> (name: String, score: Int) {
-    let helper = RegexHelper(pattern: #"([\-\w]*)\s(\d+)"#)
-    let result = helper.parse(line)
-    let name = result[0]
-    let score = Int(result[1])!
-    return (name: name, score: score)
+func isSafe(_ report: [Int]) -> Bool {
+    var sortedReport = report.sorted()
+    let reverseSortedReport = sortedReport.reversed()
+    
+    guard sortedReport.elementsEqual(report) || reverseSortedReport.elementsEqual(report) else { return false }
+    
+    var currentNumber = sortedReport.removeFirst()
+    for number in sortedReport {
+        if number - currentNumber > 3 { return false }
+        if number - currentNumber < 1 { return false }
+        currentNumber = number
+    }
+    
+    return true
+}
+
+func parseLine(_ line: String) -> [Int] {
+    line.components(separatedBy: " ").map { Int($0)! }
 }
 
 main()
